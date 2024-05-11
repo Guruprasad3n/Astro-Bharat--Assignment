@@ -9,7 +9,7 @@ export const registerAstrologer = async (req: Request, res: Response) => {
     email,
     languages,
     specialties,
-    image: profileImageUrl,
+    image,
   } = req.body;
   try {
     const astrologer = new AstrologerModel({
@@ -18,7 +18,7 @@ export const registerAstrologer = async (req: Request, res: Response) => {
       email,
       languages,
       specialties,
-      profileImageUrl,
+      profileImageUrl: image,
     });
 
     const existingAstrologer = await AstrologerModel.findOne({ email });
