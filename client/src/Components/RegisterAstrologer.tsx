@@ -16,6 +16,8 @@ import {
   TextField,
 } from "@mui/material";
 import { useAddAstrologerMutation } from "../Redux/api";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const RegisterAstrologer: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -26,6 +28,7 @@ const RegisterAstrologer: React.FC = () => {
   const [image, setImage] = React.useState<File | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
+  const navigate = useNavigate();
   const handleLanguageChange = (event: SelectChangeEvent<string[]>) => {
     setLanguages(event.target.value as string[]);
   };
@@ -46,6 +49,12 @@ const RegisterAstrologer: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!name || !email || !gender || languages.length === 0 || specialties.length === 0 || !image) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+     toast.loading('Registering astrologer...');
     setIsLoading(true);
 
     const imageUrl = await postDetails(image);
@@ -81,10 +90,16 @@ const RegisterAstrologer: React.FC = () => {
       setLanguages([]);
       setSpecialties([]);
       setImage(null);
+     
+      // toast.dismiss(loadingToast); 
+      toast.success("Astrologer Registration Success");
+      navigate("/");
     } catch (error) {
       console.error("Error adding astrologer:", error);
+      toast.error("Failed to add astrologer. Please try again.");
     } finally {
       setIsLoading(false);
+      toast.dismiss(); 
     }
   };
 
@@ -235,27 +250,6 @@ const RegisterAstrologer: React.FC = () => {
                 />
               </FormControl>
             </Grid>
-            {/* <Grid item xs={12}>
-  <FormControl fullWidth>
-    <InputLabel htmlFor="image-input">Upload Profile Image</InputLabel>
-    <Input
-      type="file"
-      id="image-input"
-      onChange={handleImageChange}
-      inputProps={{ accept: "image/*" }} // Limit file types to images
-      style={{ display: "none" }} // Hide the default input element
-    />
-    <label htmlFor="image-input">
-      <Button
-        variant="outlined"
-        component="span"
-        startIcon={<CloudUploadIcon />}
-      >
-        Choose File
-      </Button>
-    </label>
-  </FormControl>
-</Grid> */}
           </Grid>
           <Box mt={4} display="flex" justifyContent="center">
             <Button

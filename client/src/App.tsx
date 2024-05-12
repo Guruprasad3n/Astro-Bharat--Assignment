@@ -1,4 +1,5 @@
 import "./App.css";
+import toast, { Toaster } from 'react-hot-toast';
 import { Route, Routes } from "react-router-dom";
 import RegisterAstrologer from "./Components/RegisterAstrologer";
 import AdminPanel from "./Components/AdminPanel";
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<AdminPanel />} />
         <Route path="/edit/:id" element={<EditAstrologer />} />
       </Routes>
+      <Toaster />
       {/* Hello Banti Chocklet Kavala
       <Button variant="contained">
         Hello world <AddCircleIcon />{" "}

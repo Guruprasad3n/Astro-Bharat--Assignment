@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { SelectChangeEvent } from "@mui/material/Select";
+import { useSelector } from "react-redux";
 
 import {
   Box,
@@ -15,8 +16,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useUpdateAstrologerMutation } from "../Redux/api";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface AstrologerFormData {
   name: string;
@@ -28,36 +29,36 @@ interface AstrologerFormData {
 }
 
 const EditAstrologer: React.FC = () => {
+  const userData = localStorage.getItem("astrologersData");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const toBeEdit = useSelector((state: any) => state.astrologer.toBeEdit);
+  console.log(toBeEdit);
   const [formData, setFormData] = useState<AstrologerFormData>({
-    name: toBeEdit?.name || "",
-    gender: toBeEdit?.gender || "",
-    email: toBeEdit?.email || "",
-    languages: toBeEdit?.languages || [],
-    specialties: toBeEdit?.specialties || [],
+    name: "",
+    gender: "",
+    email: "",
+    languages: [],
+    specialties: [],
     image: null,
   });
 
-  // const [isLoading, setIsLoading] = useState(false);
-
   const [updateAstrologer, { isLoading }] = useUpdateAstrologerMutation();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const storedFormData = localStorage.getItem("astrologerFormData");
-    if (storedFormData) {
-      setFormData(JSON.parse(storedFormData));
-    } else if (toBeEdit) {
+    if (userData) {
+      const storedData = JSON.parse(userData);
       setFormData({
-        name: toBeEdit.name || "",
-        gender: toBeEdit.gender || "",
-        email: toBeEdit.email || "",
-        languages: toBeEdit.languages || [],
-        specialties: toBeEdit.specialties || [],
-        image: toBeEdit.image,
+        name: storedData.name || "",
+        gender: storedData.gender || "",
+        email: storedData.email || "",
+        languages: storedData.languages || [],
+        specialties: storedData.specialties || [],
+        image: storedData.profileImageUrl || null,
       });
     }
-  }, [toBeEdit]);
+  }, [userData]);
 
   const handleLanguageChange = (event: SelectChangeEvent<string[]>) => {
     const selectedLanguages = event.target.value as string[];
@@ -68,44 +69,67 @@ const EditAstrologer: React.FC = () => {
     const selectedSpecialties = event.target.value as string[];
     setFormData({ ...formData, specialties: selectedSpecialties });
   };
-
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      setFormData({ ...formData, image: files[0] });
+      const selectedImage = files[0];
+      setFormData({ ...formData, image: selectedImage });
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        setPreviewImage(imageUrl);
+      };
+      reader.readAsDataURL(selectedImage);
     }
   };
 
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (toBeEdit) {
+    if (userData) {
       try {
+        toast.loading("Updating astrologer data...");
         let imageUrl = null;
-        if (formData.image) {
+
+        if (formData.image && formData.image instanceof File) {
           imageUrl = await postDetails(formData.image);
           if (!imageUrl) {
-            console.error("Failed to upload image to Cloudinary");
+            toast.error("Failed to upload image to Cloudinary");
             return;
           }
+        } else {
+          const storedData = JSON.parse(userData);
+          imageUrl = storedData.profileImageUrl;
         }
-        const finalImageUrl = imageUrl || toBeEdit.image;
-        console.log("finalImageUrl", finalImageUrl);
+
         const astrologerUpdateInput: AstrologerFormData = {
           ...formData,
-          image: finalImageUrl,
+          image: imageUrl,
         };
-
+        const storedData = JSON.parse(userData);
         const updatedData = await updateAstrologer({
-          id: toBeEdit._id,
+          id: storedData._id,
           ...astrologerUpdateInput,
         });
+        toast.success("Astrologer Data Updated");
         console.log("Updated Data:", updatedData);
         navigate("/");
       } catch (error) {
         console.error("Error updating astrologer data:", error);
+        toast.error("Error updating astrologer data");
+      } finally {
+        toast.dismiss();
       }
+    } else {
+      console.error("No data to update");
     }
   };
+
   useEffect(() => {
     localStorage.setItem("astrologerFormData", JSON.stringify(formData));
   }, [formData]);
@@ -143,6 +167,7 @@ const EditAstrologer: React.FC = () => {
       }
     } else {
       console.error("Image type must be either JPEG or PNG");
+      toast.error("Image type must be either JPEG or PNG");
       return null;
     }
   };
@@ -265,14 +290,28 @@ const EditAstrologer: React.FC = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel htmlFor="image-input">Profile Image</InputLabel>
-              <Input
+            <Box display="flex" alignItems="center">
+              <img
+                src={
+                  previewImage ||
+                  (typeof formData.image === "string" ? formData.image : "")
+                }
+                alt="Profile"
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }}
+                onClick={handleImageClick}
+              />
+              <input
                 type="file"
-                id="image-input"
+                ref={fileInputRef}
+                style={{ display: "none" }}
                 onChange={handleImageChange}
               />
-            </FormControl>
+            </Box>
           </Grid>
         </Grid>
         <Box mt={3} display="flex" justifyContent="center">

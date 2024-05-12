@@ -22,11 +22,12 @@ export interface Astrologer {
   specialties: string[];
   profileImageUrl?: string;
 }
-
+// https://project-w3wa.onrender.com
+// http://localhost:8000
 export const astrologersApi : any = createApi({
   reducerPath: "astrologersApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://project-w3wa.onrender.com/api/astrologer",
+    baseUrl: "http://localhost:8000/api/astrologer",
   }),
   tagTypes: ["Astrologers"],
   endpoints: (builder) => ({

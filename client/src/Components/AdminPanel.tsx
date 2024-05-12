@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Astrologer, useGetAstrologersQuery } from "../Redux/api";
 import { Button, CircularProgress, Typography } from "@mui/material";
@@ -45,6 +44,8 @@ const AdminPanel: React.FC = () => {
         (astro: Astrologer) => astro._id === astrologerId
       );
       if (astrologer) {
+        const astrologerString = JSON.stringify(astrologer);
+        localStorage.setItem("astrologersData", astrologerString);
         dispatch(setToBeEdit(astrologer));
         navigate(`/edit/${astrologerId}`);
       }
@@ -55,12 +56,9 @@ const AdminPanel: React.FC = () => {
 
   if (isSuccess) {
     const columns: GridColDef[] = [
-      { 
-        field: "", 
-        headerName: "", 
-        // flex: "none",
-        // headerCheckboxSelection: true,
-        // checkboxSelection: true,
+      {
+        field: "",
+        headerName: "",
         width: 50,
       },
       {
@@ -71,29 +69,28 @@ const AdminPanel: React.FC = () => {
           <img
             src={params.value}
             alt="Profile"
-            style={{ width: 50, height: 50, borderRadius: "50%" }}
+            style={{ width: 55, height: 50, borderRadius: "50%" }}
           />
         ),
       },
-      { 
-        field: "name", 
-        headerName: "Name", 
+      {
+        field: "name",
+        headerName: "Name",
         flex: 1,
-        renderCell: (params: any) => (
-          <Typography variant="body1">
-            {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          </Typography>
-        ),
+        // renderCell: (params: any) => (
+        //   <Typography
+        //     variant="body1"
+        //   >
+        //     {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+        //   </Typography>
+        // ),
       },
-      { 
-        field: "gender", 
-        headerName: "Gender", 
+      {
+        field: "gender",
+        headerName: "Gender",
         flex: 1,
-        renderCell: (params: any) => (
-          <Typography variant="body1">
-            {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          </Typography>
-        ),
+      
+
       },
       { field: "email", headerName: "Email", flex: 1 },
       { field: "languages", headerName: "Languages", flex: 1 },
@@ -114,23 +111,21 @@ const AdminPanel: React.FC = () => {
     ];
 
     return (
-      <div style={{ height:"87vh", width: "100%" }}>
+      <div style={{ height: "87vh", width: "100%" }}>
         <DataGrid
           rows={data.astrologers}
           columns={columns}
           getRowId={(row) => row._id}
           checkboxSelection
           pagination
-          // pageSize={5}
-          // rowsPerPageOptions={[5, 10, 20]}
-          sortingOrder={['asc', 'desc']}
+          sortingOrder={["asc", "desc"]}
           filterModel={{
             items: [
-              { field: 'name', value: '', operator: 'contains' },
-              { field: 'gender', value: '', operator: 'contains' },
-              { field: 'email', value: '', operator: 'contains' },
-              { field: 'languages', value: '', operator: 'contains' },
-              { field: 'specialties', value: '', operator: 'contains' },
+              { field: "name", value: "", operator: "contains" },
+              { field: "gender", value: "", operator: "contains" },
+              { field: "email", value: "", operator: "contains" },
+              { field: "languages", value: "", operator: "contains" },
+              { field: "specialties", value: "", operator: "contains" },
             ],
           }}
         />
