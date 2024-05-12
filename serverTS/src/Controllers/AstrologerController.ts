@@ -57,12 +57,18 @@ export const editAstrologer = async (req: Request, res: Response) => {
     const astrologer = await AstrologerModel.findByIdAndUpdate(id, req.body, {
       new: true,
     });
+    
     if (!astrologer) {
       return res.status(404).send({ message: "Astrologer not found" });
     }
+    const updatedAstrologer = await AstrologerModel.findById(id);
+    
+    if (!updatedAstrologer) {
+      return res.status(404).send({ message: "Updated Astrologer not found" });
+    }
     return res
       .status(200)
-      .send({ message: "Astrologer Data Updated Success", astrologer });
+      .send({ message: "Astrologer Data Updated Success", astrologer:updatedAstrologer });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: "Internal Server Error" });
