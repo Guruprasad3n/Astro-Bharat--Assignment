@@ -53,8 +53,21 @@ export const allAstrologers = async (req: Request, res: Response) => {
 
 export const editAstrologer = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const {
+    name,
+    gender,
+    email,
+    languages,
+    specialties,
+    image,
+  } = req.body;
   try {
-    const astrologer = await AstrologerModel.findByIdAndUpdate(id, req.body, {
+    const astrologer = await AstrologerModel.findByIdAndUpdate(id, {  name,
+      gender,
+      email,
+      languages,
+      specialties,
+      profileImageUrl: image,}, {
       new: true,
     });
     
@@ -66,6 +79,9 @@ export const editAstrologer = async (req: Request, res: Response) => {
     if (!updatedAstrologer) {
       return res.status(404).send({ message: "Updated Astrologer not found" });
     }
+console.log("req.body", req.body)
+    console.log("astrologer", astrologer)
+    console.log("updatedAstrologer", updatedAstrologer)
     return res
       .status(200)
       .send({ message: "Astrologer Data Updated Success", astrologer:updatedAstrologer });
