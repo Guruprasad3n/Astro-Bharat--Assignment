@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Astrologer, useGetAstrologersQuery } from "../Redux/api";
-import { Button, CircularProgress, Typography } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setToBeEdit } from "../Redux/reducer";

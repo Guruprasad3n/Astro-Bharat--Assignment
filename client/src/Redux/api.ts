@@ -27,7 +27,7 @@ export interface Astrologer {
 export const astrologersApi : any = createApi({
   reducerPath: "astrologersApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8000/api/astrologer",
+    baseUrl: "https://project-w3wa.onrender.com/api/astrologer",
   }),
   tagTypes: ["Astrologers"],
   endpoints: (builder) => ({
