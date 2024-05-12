@@ -9,7 +9,6 @@ import {
   MenuItem,
   Button,
   Grid,
-  Typography,
   Box,
   SelectChangeEvent,
   Container,
@@ -129,9 +128,7 @@ const RegisterAstrologer: React.FC = () => {
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 8 }}>
-        <Typography variant="h4" align="center" mb={5}>
-          Register
-        </Typography>
+        <h3 style={{ textAlign: "center", marginBottom: "5px" }}>Register</h3>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>

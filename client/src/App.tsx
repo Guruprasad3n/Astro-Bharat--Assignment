@@ -1,5 +1,3 @@
-
-
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import RegisterAstrologer from "./Components/RegisterAstrologer";
@@ -8,10 +6,8 @@ import EditAstrologer from "./Components/EditAstrologer";
 import Navbar from "./Components/Navbar";
 
 function App() {
-
-
   return (
-    <>
+    <div className="App">
       <Navbar />
       <Routes>
         <Route path="/register" element={<RegisterAstrologer />} />
@@ -22,7 +18,7 @@ function App() {
       <Button variant="contained">
         Hello world <AddCircleIcon />{" "}
       </Button> */}
-    </>
+    </div>
   );
 }
 

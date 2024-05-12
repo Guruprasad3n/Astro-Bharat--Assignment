@@ -1,15 +1,21 @@
-import React from "react";
+
+import React, { useEffect } from "react";
 import { Astrologer, useGetAstrologersQuery } from "../Redux/api";
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setToBeEdit } from "../Redux/reducer";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 const AdminPanel: React.FC = () => {
-  const { isLoading, isError, isSuccess, data, error } =
+  const { isLoading, isError, isSuccess, data, error, refetch } =
     useGetAstrologersQuery();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (isLoading) {
     return (
@@ -48,62 +54,86 @@ const AdminPanel: React.FC = () => {
   };
 
   if (isSuccess) {
+    const columns: GridColDef[] = [
+      { 
+        field: "", 
+        headerName: "", 
+        // flex: "none",
+        // headerCheckboxSelection: true,
+        // checkboxSelection: true,
+        width: 50,
+      },
+      {
+        field: "profileImageUrl",
+        headerName: "Profile Image",
+        flex: 1,
+        renderCell: (params: any) => (
+          <img
+            src={params.value}
+            alt="Profile"
+            style={{ width: 50, height: 50, borderRadius: "50%" }}
+          />
+        ),
+      },
+      { 
+        field: "name", 
+        headerName: "Name", 
+        flex: 1,
+        renderCell: (params: any) => (
+          <Typography variant="body1">
+            {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+          </Typography>
+        ),
+      },
+      { 
+        field: "gender", 
+        headerName: "Gender", 
+        flex: 1,
+        renderCell: (params: any) => (
+          <Typography variant="body1">
+            {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+          </Typography>
+        ),
+      },
+      { field: "email", headerName: "Email", flex: 1 },
+      { field: "languages", headerName: "Languages", flex: 1 },
+      { field: "specialties", headerName: "Specialties", flex: 1 },
+      {
+        field: "edit",
+        headerName: "Edit",
+        flex: 1,
+        renderCell: (params: any) => (
+          <Button
+            variant="contained"
+            onClick={() => handleEdit(params.row._id)}
+          >
+            Edit
+          </Button>
+        ),
+      },
+    ];
+
     return (
-      <div style={{ padding: "20px" }}>
-        <h1 style={{ textAlign: "center" }}>Admin Panel</h1>
-        <Grid container spacing={3}>
-          {data &&
-            data?.astrologers.map((e: Astrologer) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={3} // Adjusted width here
-                key={e._id}
-                style={{ marginBottom: "20px" }}
-              >
-                <div
-                  style={{
-                    border: "1px solid #ccc",
-                    borderRadius: "8px",
-                    padding: "15px",
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  {e.profileImageUrl && (
-                    <img
-                      src={e.profileImageUrl}
-                      alt="Astrologer"
-                      style={{
-                        width: "100%",
-                        height: "240px",
-                        borderRadius: "8px",
-                        marginBottom: "10px",
-                      }}
-                    />
-                  )}
-                  <Typography variant="subtitle1">Name: {e.name}</Typography>
-                  <Typography variant="body2">Gender: {e.gender}</Typography>
-                  <Typography variant="body2">Email: {e.email}</Typography>
-                  <Typography variant="body2">
-                    Languages: {e.languages.join(", ")}
-                  </Typography>
-                  <Typography variant="body2">
-                    Specialties: {e.specialties.join(", ")}
-                  </Typography>
-                  <Box display="flex" justifyContent="center">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleEdit(e._id)}
-                      style={{ marginTop: "10px" }}
-                    >
-                      Edit
-                    </Button>
-                  </Box>
-                </div>
-              </Grid>
-            ))}
-        </Grid>
+      <div style={{ height:"87vh", width: "100%" }}>
+        <DataGrid
+          rows={data.astrologers}
+          columns={columns}
+          getRowId={(row) => row._id}
+          checkboxSelection
+          pagination
+          // pageSize={5}
+          // rowsPerPageOptions={[5, 10, 20]}
+          sortingOrder={['asc', 'desc']}
+          filterModel={{
+            items: [
+              { field: 'name', value: '', operator: 'contains' },
+              { field: 'gender', value: '', operator: 'contains' },
+              { field: 'email', value: '', operator: 'contains' },
+              { field: 'languages', value: '', operator: 'contains' },
+              { field: 'specialties', value: '', operator: 'contains' },
+            ],
+          }}
+        />
       </div>
     );
   }
